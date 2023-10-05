@@ -78,4 +78,46 @@ impl Universe {
         }
         self.cells = next;
     }
+
+    // コンストラクタ
+    pub fn new() -> Universe {
+        let width = 64;
+        let height = 64;
+
+        let cells = (0..width * height)
+            .map(|i| {
+                if i % 2 == 0 || i % 7 == 0 {
+                    Cell::Alive              
+                } else {
+                    Cell::Dead
+                }
+            })
+        .collect();
+
+        Universe {
+            width,
+            height,
+            cells,
+        }
+    }
+
+    // レンダリング
+    pub fn render(&self) -> String {
+        self.to_string()
+    }
+}
+
+// Universeに対してstd::ftm::Displayを実装する
+impl std::fmt::Display for Universe {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        for line in self.cells.as_slice().chunks(self.width as usize) {
+            for &cell in line {
+                let symbol = if cell == Cell::Dead {'□'} else {'■'};
+                write!(f, "{}", symbol)?;
+            }
+            write!(f, "\n")?;
+        }
+
+        Ok(())
+    }
 }
