@@ -66,16 +66,15 @@ wasm-game-of-life
 ```
 このディレクトリの中で重要なのは依存関係を記述している`Cargo.toml`とクレートのルートとなる`src/lib.rs`である。
 
-<!-- draft -->
+wasm\_bindgenはwasmとJavaScriptとのインターフェースである。
 
-wasm\_bindgen: JavaScriptとのインターフェース
+rustからwasmへのビルドは以下のコマンドで実行する。
 
-ビルド: 
 ```bash
 $ wasm-pack build
 ```
 
-ビルド後の`pkg`の中身
+ビルド後にはディレクトリ`pkg`が作成されていて、中身は以下のようになっている。
 
 ```text
 pkg
@@ -90,26 +89,32 @@ pkg
 1 directory, 7 files
 ```
 
+.wasmが付くファイルはwasmにコンパイルされて生じたファイルである。
+
+npmコマンドを使ってアプリを作成する
+
 ```bash
 $ npm init wasm-app www
 ```
 
-wwwに入って
+このコマンドの実行後にはディレクトリwwwが作成されている。
+
+次にwwwに入って以下のコマンドを実行する。
 
 ```bash
 $ npm install
 ```
 
-Error:
-最後にサーバーを建てるところ
+最後に以下のコマンドを実行してサーバーを建てる。
 
 ```bash
 $ npm run start
 ```
 
-でwebpackのOpenSSLエラーが出てサーバーが建たない。
+このときwebpackのOpenSSLエラーが出てサーバーが建たなかった。どうやらNode.jsのバージョンが17より新しいことによるものらしい。
+今回はあくまでlocalhostで動かすだけでセキュリティなどは気にしないのでOpenSSLのレガシーモードで実行することにした。
 
-これは以下のように`game-of-life/www/pckage.json`をのscriptの中のstartに以下のように`--openssl-legacy-provider`を追加して編集する必要がある
+これを設定をするには、`game-of-life/www/pckage.json`をの"script"の中の"start"に以下のように`--openssl-legacy-provider`を追加して編集する必要がある
 
 ```JSON
 "script": {
@@ -118,9 +123,9 @@ $ npm run start
 }
 ```
 
-疑問点?:
-
-JavaScriptの開発はよくわからないが、プロジェクトのディレクトリで生じたファイルはどこまでリポジトリに上げれば良いのだろうか。
+- 疑問点?:
+    - JavaScriptの開発はよくわからないが、プロジェクトのディレクトリで生じたファイルはどこまでリポジトリに上げれば良いのだろうか。
+    - 答え: JavaScriptのファイルや設定ファイル等はgitで追跡する。しかし`wasm-pack`によって生成された\*.wasmファイルや\*.js,\*.tsファイルは追跡しないようにする。 
 
 ## 3 life game の実装
 
