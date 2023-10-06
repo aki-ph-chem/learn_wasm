@@ -47,8 +47,8 @@ const pause = () => {
 
 const init_dead = () => {
     playPauseButton.textContent = "▶";
-    renderLoop();
-    cancelAnimationFrame(animationId);
+    drawGrid();
+    drawCells();
     animationId = null;
 }
 
