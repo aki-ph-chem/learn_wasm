@@ -7,9 +7,7 @@ const DEAD_COLOR = "#FFFFFF";
 const ALIVE_COLOR = "#000000";
 
 // construct the universe
-//const universe = Universe.new();
-//const universe = Universe.new_space_ship();
-const universe = Universe.new_random();
+const universe = Universe.new_dead();
 const width = universe.width();
 const height = universe.height();
 
@@ -43,6 +41,13 @@ const play = () => {
 
 const pause = () => {
     playPauseButton.textContent = "▶";
+    cancelAnimationFrame(animationId);
+    animationId = null;
+}
+
+const init_dead = () => {
+    playPauseButton.textContent = "▶";
+    renderLoop();
     cancelAnimationFrame(animationId);
     animationId = null;
 }
@@ -122,4 +127,4 @@ const drawCells = () => {
     ctx.stroke();
 }
 
-play();
+init_dead();

@@ -214,6 +214,20 @@ impl Universe {
             cells,
         }
     }
+
+    pub fn new_dead() -> Universe {
+        let width = 64;
+        let height = 64;
+
+        // セルをすべて死で初期化
+        let cells = vec![Cell::Dead; (width as usize) * (height as usize) ];
+        Universe {
+            width,
+            height,
+            cells,
+        }
+    }
+
     // set the width of the Universe.
     pub fn set_width(&mut self, width: u32) {
         self.width = width;
