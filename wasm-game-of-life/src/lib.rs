@@ -3,6 +3,14 @@ mod utils;
 use wasm_bindgen::prelude::*;
 use js_sys::Math;
 
+extern crate web_sys;
+
+macro_rules! log {
+    ($($t:tt)*) => {
+        web_sys::console::log_1(&format!($($t)*).into());
+    }
+}
+
 #[wasm_bindgen]
 extern "C" {
     fn alert(s: &str);
@@ -78,6 +86,14 @@ impl Universe {
                 let cell = self.cells[idx];
                 let live_neighbors = self.live_neighbor_count(row, col);
 
+                log!(
+                    "cell[{}, {}] is initially {:?} and has {} live neighbors",
+                    row,
+                    col,
+                    cell,
+                    live_neighbors
+                );
+
                 let next_cell = match (cell, live_neighbors) {
                     // life gameのルールを反映
                     (Cell::Alive, x) if x < 2 => Cell::Dead,
@@ -87,6 +103,8 @@ impl Universe {
                     (othterwise, _) => othterwise,
                 };
 
+                log!("  it becoms {:?}", next_cell);
+
                 next[idx] = next_cell;
             }
         }
@@ -95,6 +113,7 @@ impl Universe {
 
     // コンストラクタ
     pub fn new() -> Universe {
+        utils::set_panic_hook();
         let width = 64;
         let height = 64;
 
@@ -117,6 +136,7 @@ impl Universe {
 
     // 宇宙を宇宙船で初期化する
     pub fn new_space_ship() -> Universe {
+        utils::set_panic_hook();
         let width = 64;
         let height = 64;
 
@@ -185,6 +205,7 @@ impl Universe {
     }
 
     pub fn new_random() -> Universe {
+        utils::set_panic_hook();
         let width = 64;
         let height = 64;
 
