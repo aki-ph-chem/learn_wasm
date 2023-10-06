@@ -1,6 +1,7 @@
 mod utils;
 
 use wasm_bindgen::prelude::*;
+use js_sys::Math;
 
 #[wasm_bindgen]
 extern "C" {
@@ -162,6 +163,27 @@ impl Universe {
         cells[index(33,34)] = Cell::Alive;
         cells[index(34,34)] = Cell::Alive;
         cells[index(35,34)] = Cell::Alive;
+
+        Universe {
+            width,
+            height,
+            cells,
+        }
+    }
+
+    pub fn new_random() -> Universe {
+        let width = 64;
+        let height = 64;
+
+        let cells = (0..width * height)
+            .map(|_i| {
+                if Math::random() < 0.5 {
+                    Cell::Alive              
+                } else {
+                    Cell::Dead
+                }
+            })
+        .collect();
 
         Universe {
             width,

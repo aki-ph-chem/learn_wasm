@@ -8,7 +8,8 @@ const ALIVE_COLOR = "#000000";
 
 // construct the universe
 //const universe = Universe.new();
-const universe = Universe.new_space_ship();
+//const universe = Universe.new_space_ship();
+const universe = Universe.new_random();
 const width = universe.width();
 const height = universe.height();
 
