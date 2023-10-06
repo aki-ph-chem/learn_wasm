@@ -51,6 +51,19 @@ impl Universe {
         }
         count
     }
+
+    // Get the dead and alive values of entire Universe
+    pub fn get_cells(&self) -> &[Cell] {
+        &self.cells
+    }
+
+    // set cells be alive in a universe by passing the row and column
+    pub fn set_cells(&mut self, cells: &[(u32,u32)]) {
+        for (row, col) in cells.iter().cloned() {
+            let idx = self.get_index(row, col);
+            self.cells[idx] = Cell::Alive;
+        }
+    }
 }
 
 #[wasm_bindgen]
@@ -190,6 +203,21 @@ impl Universe {
             height,
             cells,
         }
+    }
+    // set the width of the Universe.
+    pub fn set_width(&mut self, width: u32) {
+        self.width = width;
+        self.cells = (0..width * self.height)
+            .map(|_i| Cell::Dead)
+            .collect();
+    }
+
+    // set the height of the Universe
+    pub fn set_height(&mut self, height: u32) {
+        self.height = height;
+        self.cells = (0..self.width * height)
+            .map(|_i| Cell::Dead)
+            .collect();
     }
 
     // レンダリング
