@@ -4,7 +4,12 @@ WebAssemblyを[Rust and WebAssembly](https://rustwasm.github.io/docs/book/game-o
 
 ## 0 環境:
 
-Arch Linux x86\_64
+- OS: Arch Linux x86\_64
+- web browser: Google Chrome
+- Node.js: 20.8.0
+- npm: 10.2.0
+- rustc: 1.70.0 
+- cargo: 1.70.0
 
 ## 1 準備: 必要なツールを揃える
 
@@ -191,6 +196,7 @@ life gameは本来無限に広い宇宙で繰り広げられるが、無限の�
     - これをwasmのメモリからjsのメモリにコピーしてHTMLの`textContent`として描画する
     - 後にこのコピーを避ける実装に書き換える(`canvas`を使う)
 
+<!-- draft -->
 ### Rustによる実装  
 
 `wasm-game-of-life/src/lib.rs`にセルの定義を実装していく
@@ -200,6 +206,31 @@ life gameは本来無限に広い宇宙で繰り広げられるが、無限の�
 
 続いて宇宙を構造体`Universe`として実装していく
 
+<!-- draft -->
 ### Rustのメモリをコピーせず直接レンダリングを行う
 
 Rustの`String`をjsのstringに変換することでコピーなしでレンダリングできる。
+
+<!-- draft -->
+### life game のテスト
+
+ここではRustによるWebAssemblyのプロジェクトでのテストの行い方について説明する。
+
+- `tick()`を例に挙げてテストをする
+- wasmにコンパイルされたRustではborrowされた値を返せない
+
+特定の配置の宇宙に対して`tick()`を呼び出した後の宇宙が期待した通りになるかを自動テストでテストする。
+
+<!-- draft -->
+### デバッグ
+
+コンストラクタの関数内の一行目に`utils::set_panic_hook();`を挿入する。
+
+```Rust
+pub fn new() -> Universe {
+    utils::set_panic_hook();
+    // ...
+}
+```
+
+wasm側から`console.log`を使うには`web-sys`クレート経由で行う
