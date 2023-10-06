@@ -52,7 +52,7 @@ const getIndex = (row, column) => {
 
 const drawCells = () => {
     const cellptr = universe.cells();
-    const cells = new Unit8Array(memory.buffer, cellptr, width * height);
+    const cells = new Uint8Array(memory.buffer, cellptr, width * height);
 
     ctx.beginPath();
 
@@ -64,7 +64,7 @@ const drawCells = () => {
             ? DEAD_COLOR
             : ALIVE_COLOR;
 
-            ctl.fillRect(
+            ctx.fillRect(
                 col * (CELL_SIZE + 1) + 1,
                 row * (CELL_SIZE + 1) + 1,
                 CELL_SIZE,
