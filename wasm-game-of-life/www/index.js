@@ -7,7 +7,8 @@ const DEAD_COLOR = "#FFFFFF";
 const ALIVE_COLOR = "#000000";
 
 // construct the universe
-const universe = Universe.new();
+//const universe = Universe.new();
+const universe = Universe.new_space_ship();
 const width = universe.width();
 const height = universe.height();
 

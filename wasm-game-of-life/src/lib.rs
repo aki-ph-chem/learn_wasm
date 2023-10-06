@@ -101,6 +101,75 @@ impl Universe {
         }
     }
 
+    // 宇宙を宇宙船で初期化する
+    pub fn new_space_ship() -> Universe {
+        let width = 64;
+        let height = 64;
+
+        let mut cells = vec![Cell::Dead; (width * height) as usize];
+
+        let index = |i,j| { i + width as usize * j};
+
+        // 一機目の宇宙船
+        cells[index(2,0)] = Cell::Alive;
+
+        cells[index(0,1)] = Cell::Alive;
+        cells[index(4,1)] = Cell::Alive;
+
+        cells[index(5,2)] = Cell::Alive;
+
+        cells[index(0,3)] = Cell::Alive;
+        cells[index(5,3)] = Cell::Alive;
+
+        cells[index(1,4)] = Cell::Alive;
+        cells[index(2,4)] = Cell::Alive;
+        cells[index(3,4)] = Cell::Alive;
+        cells[index(4,4)] = Cell::Alive;
+        cells[index(5,4)] = Cell::Alive;
+
+        // 二機目の宇宙船
+        // 一機目からは(10,10)だけ離れている
+        cells[index(12,10)] = Cell::Alive;
+
+        cells[index(10,11)] = Cell::Alive;
+        cells[index(14,11)] = Cell::Alive;
+
+        cells[index(15,12)] = Cell::Alive;
+
+        cells[index(10,13)] = Cell::Alive;
+        cells[index(15,13)] = Cell::Alive;
+
+        cells[index(11,14)] = Cell::Alive;
+        cells[index(12,14)] = Cell::Alive;
+        cells[index(13,14)] = Cell::Alive;
+        cells[index(14,14)] = Cell::Alive;
+        cells[index(15,14)] = Cell::Alive;
+
+        // 三機目の宇宙船
+        // 一機目からは(30,30)だけ離れている
+        cells[index(32,30)] = Cell::Alive;
+
+        cells[index(30,31)] = Cell::Alive;
+        cells[index(34,31)] = Cell::Alive;
+
+        cells[index(35,32)] = Cell::Alive;
+
+        cells[index(30,33)] = Cell::Alive;
+        cells[index(35,33)] = Cell::Alive;
+
+        cells[index(31,34)] = Cell::Alive;
+        cells[index(32,34)] = Cell::Alive;
+        cells[index(33,34)] = Cell::Alive;
+        cells[index(34,34)] = Cell::Alive;
+        cells[index(35,34)] = Cell::Alive;
+
+        Universe {
+            width,
+            height,
+            cells,
+        }
+    }
+
     // レンダリング
     pub fn render(&self) -> String {
         self.to_string()
