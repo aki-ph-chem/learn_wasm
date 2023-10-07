@@ -134,7 +134,7 @@ const fps = new class {
         const now = performance.now();
         const delta = now - this.lastFrameTimeStamp;
         this.lastFrameTimeStamp = now;
-        const fps = 1 / this.delta * 1000;
+        const fps = 1 / delta * 1000;
 
         this.frames.push(fps);
         if (this.frames.length > 100) {
