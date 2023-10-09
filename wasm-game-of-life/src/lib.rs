@@ -1,40 +1,5 @@
 mod utils;
 
-use wasm_bindgen::prelude::*;
-use js_sys::Math;
-extern crate web_sys;
-use web_sys::console;
-
-// timer
-pub struct Timer<'a> {
-    name: &'a str,
-}
-
-impl<'a> Timer<'a> {
-    pub fn new(name: &'a str) -> Timer<'a> {
-        console::time_with_label(name);
-        Timer {name}
-    }
-}
-
-impl<'a> Drop for Timer<'a> {
-    fn drop(&mut self) {
-        console::time_end_with_label(self.name);
-    }
-}
-
-#[wasm_bindgen]
-extern "C" {
-    fn alert(s: &str);
-}
-
-#[wasm_bindgen]
-pub fn greet(your_name: &str) {
-    let fmt = format!("Hello, {}!", your_name);
-    alert(&fmt);
-}
-
-#[wasm_bindgen]
 #[repr(u8)]
 #[derive(Clone,Copy,Debug,PartialEq,Eq)]
 pub enum Cell {
@@ -52,7 +17,6 @@ impl Cell {
     }
 }
 
-#[wasm_bindgen]
 pub struct Universe {
     width: u32,
     height: u32,
@@ -96,39 +60,29 @@ impl Universe {
     }
 }
 
-#[wasm_bindgen]
 impl Universe {
     // 次の世代を計算する
     pub fn tick(&mut self) {
-        let _timer = Timer::new("Universe::tick");
-        let mut next = {
-            let _timer = Timer::new("allocate next cells");
-            self.cells.clone()
-        };
+        let mut next = self.cells.clone();
 
-        {
-            let _time = Timer::new("new generation");
-            for row in 0..self.height {
-                for col in 0..self.width {
-                    let idx = self.get_index(row, col);
-                    let cell = self.cells[idx];
-                    let live_neighbors = self.live_neighbor_count(row, col);
+        for row in 0..self.height {
+            for col in 0..self.width {
+                let idx = self.get_index(row, col);
+                let cell = self.cells[idx];
+                let live_neighbors = self.live_neighbor_count(row, col);
 
-                    let next_cell = match (cell, live_neighbors) {
-                        // life gameのルールを反映
-                        (Cell::Alive, x) if x < 2 => Cell::Dead,
-                        (Cell::Alive, 2) | (Cell::Alive, 3) => Cell::Alive,
-                        (Cell::Alive, x) if x > 3 => Cell::Dead,
-                        (Cell::Dead, 3) => Cell::Alive,
-                        (othterwise, _) => othterwise,
-                    };
+                let next_cell = match (cell, live_neighbors) {
+                    // life gameのルールを反映
+                    (Cell::Alive, x) if x < 2 => Cell::Dead,
+                    (Cell::Alive, 2) | (Cell::Alive, 3) => Cell::Alive,
+                    (Cell::Alive, x) if x > 3 => Cell::Dead,
+                    (Cell::Dead, 3) => Cell::Alive,
+                    (othterwise, _) => othterwise,
+                };
 
-                    next[idx] = next_cell;
-                }
+                next[idx] = next_cell;
             }
         }
-
-        let _timer = Timer::new("free old cells");
         self.cells = next;
     }
 
@@ -223,26 +177,6 @@ impl Universe {
         }
     }
 
-    pub fn new_random() -> Universe {
-        let width = 210;
-        let height = 210;
-
-        let cells = (0..width * height)
-            .map(|_i| {
-                if Math::random() < 0.5 {
-                    Cell::Alive              
-                } else {
-                    Cell::Dead
-                }
-            })
-        .collect();
-
-        Universe {
-            width,
-            height,
-            cells,
-        }
-    }
     // set the width of the Universe.
     pub fn set_width(&mut self, width: u32) {
         self.width = width;
