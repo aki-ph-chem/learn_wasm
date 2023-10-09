@@ -101,26 +101,34 @@ impl Universe {
     // 次の世代を計算する
     pub fn tick(&mut self) {
         let _timer = Timer::new("Universe::tick");
-        let mut next = self.cells.clone();
+        let mut next = {
+            let _timer = Timer::new("allocate next cells");
+            self.cells.clone()
+        };
 
-        for row in 0..self.height {
-            for col in 0..self.width {
-                let idx = self.get_index(row, col);
-                let cell = self.cells[idx];
-                let live_neighbors = self.live_neighbor_count(row, col);
+        {
+            let _time = Timer::new("new generation");
+            for row in 0..self.height {
+                for col in 0..self.width {
+                    let idx = self.get_index(row, col);
+                    let cell = self.cells[idx];
+                    let live_neighbors = self.live_neighbor_count(row, col);
 
-                let next_cell = match (cell, live_neighbors) {
-                    // life gameのルールを反映
-                    (Cell::Alive, x) if x < 2 => Cell::Dead,
-                    (Cell::Alive, 2) | (Cell::Alive, 3) => Cell::Alive,
-                    (Cell::Alive, x) if x > 3 => Cell::Dead,
-                    (Cell::Dead, 3) => Cell::Alive,
-                    (othterwise, _) => othterwise,
-                };
+                    let next_cell = match (cell, live_neighbors) {
+                        // life gameのルールを反映
+                        (Cell::Alive, x) if x < 2 => Cell::Dead,
+                        (Cell::Alive, 2) | (Cell::Alive, 3) => Cell::Alive,
+                        (Cell::Alive, x) if x > 3 => Cell::Dead,
+                        (Cell::Dead, 3) => Cell::Alive,
+                        (othterwise, _) => othterwise,
+                    };
 
-                next[idx] = next_cell;
+                    next[idx] = next_cell;
+                }
             }
         }
+
+        let _timer = Timer::new("free old cells");
         self.cells = next;
     }
 
@@ -216,8 +224,8 @@ impl Universe {
     }
 
     pub fn new_random() -> Universe {
-        let width = 64;
-        let height = 64;
+        let width = 210;
+        let height = 210;
 
         let cells = (0..width * height)
             .map(|_i| {
