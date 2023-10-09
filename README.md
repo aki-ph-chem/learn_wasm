@@ -19,7 +19,8 @@ WebAssemblyを[Rust and WebAssembly](https://rustwasm.github.io/docs/book/game-o
 
 2. wasm-pack
 
-wasmを生成するのに必要らしい
+RustのコードをWasmにコンパイルをサポートして、JavaScripもしくはTypeScriptのグルーコードまで生成してくれる。
+
 
 インストール
 ```bash
@@ -30,7 +31,7 @@ $ cargo install wasm-pack
 
 3. cargo-generate
 
-開発をサポートするツールらしい
+開発をサポートするツールで、プロジェクトのテンプレートを作成してくれて非常に便利である。
 
 
 インストール
@@ -132,16 +133,17 @@ $ npm run start
     - JavaScriptの開発はよくわからないが、プロジェクトのディレクトリで生じたファイルはどこまでリポジトリに上げれば良いのだろうか。
     - 答え: JavaScriptのファイルや設定ファイル等はgitで追跡する。しかし`wasm-pack`によって生成された\*.wasmファイルや\*.js,\*.tsファイルは追跡しないようにする。 
 
-## 3 life game の実装
 
-### life game のルール
+## 3 life game のルール
 
-セルのうち黒色を生きている状態、白色を死んでいる状態とする。各ステップ(世代ごとに)ごとに以下のルールに従って遷移を行う。
+life gameでは、セルのうち黒色を生きている状態、白色を死んでいる状態とする。各ステップ(世代ごとに)ごとに以下のルールに従って遷移を行う。
 
 - 誕生: 死んでいるセルに隣接する生きているセルが3個あれば次の世代が誕生する
 - 生存: 生きているセルに隣接する生きているセルが２個もしくは、３個であれば、次の世代でも生存する
 - 過疎: 生きているセルに隣接する生きたセルが一つ以下ならば、過疎により死滅する
 - 過密: 生きているセルに隣接する生きたセルが4個以上ならば、過密により死滅する。
+
+## 4 life game の実装
 
 ### 実装方針
 
@@ -159,11 +161,12 @@ life gameは本来無限に広い宇宙で繰り広げられるが、無限の�
 <!-- draft -->
 ### RustとJavaScriptのインターフェース
 
-- JavaScriptのガーベージコレクタに管理化にあるヒープ(`Object`, `Array`, DOM node)はWebAssembly の線形メモリからは分離されている。
-- WebAssembly からは JavaScript のヒープにアクセスすることはできないが、JavaScriptからはWebAssemblyの線形メモリにアクセスことが可能である。
-- しかし、可能なのはスカラー型の`ArrayBuffer`としてのみアクセスが可能である
-- wasmの関数はスカラー型を受けてスカラー型を返す
-- これらはwasmとJavaScriptを結びつけるブロックである。 
+- 毎回の遷移でwasm中の全宇宙のメモリのコピーはしたくない。
+
+JavaScript(以下JS)のガーベージコレクタに管理化にあるヒープ(`Object`, `Array`, DOM node)はWebAssembly(以下Wasm) の線形メモリからは分離されている。
+そのため、WasmからJSのヒープにアクセスすることはできないが、JSからはWebAssemblyの線形メモリにアクセスことが可能である。
+しかし、アクセス可能なのはスカラー型(`u8`,`i32`,`f64`, etc..)の`ArrayBuffer`としてのみアクセスが可能である(本チュートリアルでは`Uint8Array`が登場する)
+Wasmの関数はスカラー型の値を受けてスカラー型を返す。
 
 - `wasm_bindgen`はこの境界を跨ぐ複合構造の共通の理解を定義する
 - これらは以下を含む: 
@@ -234,3 +237,9 @@ pub fn new() -> Universe {
 ```
 
 wasm側から`console.log`を使うには`web-sys`クレート経由で行う
+
+### ベンチ
+
+```bash
+$ cargo install cargo-benchmp
+```
