@@ -195,12 +195,71 @@ Wasmに宇宙を表現する構造体`Universe`を定義・実装し、JSに公�
 <!-- draft -->
 ### Rustによる実装  
 
-`wasm-game-of-life/src/lib.rs`にセルの定義を実装していく
+`wasm-game-of-life/src/lib.rs`に宇宙とセルを実装していく
 
-- ここで重要なのは`#[repr(u8)]`でこれはそれぞれのセルを1バイトで表現するという意味である。
-- `Dead`を`0`に`Alive`を`1`にするのは近接する生きていいるセルのカウントを容易にするためである。
+各セル`Cell`は`enum`で以下のように表現する。
 
-続いて宇宙を構造体`Universe`として実装していく
+```Rust
+#[wasm_bindgen]
+#[repr(u8)]
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum Cell {
+    Dead = 0,
+    Alive = 1,
+}
+```
+
+ここで重要なのは`#[repr(u8)]`でこれはそれぞれのセルを1バイトで表現することを意味する。
+もう一つ重要なのが、`Dead`を`0`に`Alive`を`1`とすることで、これは、近接する生きていいるセルのカウントを容易に行うためである。
+続いて宇宙を構造体`Universe`として実装していく。各フィールドは`width`が横幅で`height`が縦幅で、`cells`が`Cell`型のベクタとしてセルから構成される宇宙を表現している。
+
+```Rust
+#[wasm_bindgen]
+pub struct Universe {
+    width: u32,
+    height: u32,
+    cells: Vec<Cell>,
+}
+```
+
+ここで、宇宙の横幅は`width`で縦幅は`height`であるので`cells`の長さは`width * height`で得られる。
+
+与えられた `row`,`column`から`cells`にアクセスする添字を計算するメソッドは以下のように容易に実装できる。
+
+```Rust
+impl Universe {
+    fn get_index(&self, row: u32, column: u32) -> usize {
+        (row * self.width + column) as usize
+    }
+
+    // ...
+}
+```
+
+世代を進めるには一つのセルに近接するセルの数をカウントする必要があるので、カウントする関数`live_neighbor_count()`を実装する。
+
+```Rust
+impl Universe {
+    // ...
+
+    fn live_neighbor_count(&self, row: u32, column: u32) -> u8 {
+        let mut count = 0;
+        for delta_row in [self.height - 1, 0, 1].iter().cloned() {
+            for delta_col in [self.width - 1, 0, 1].iter().cloned() {
+                if delta_row == 0 && delta_col == 0 {
+                    continue;
+                }
+
+                let neighbor_row = (row + delta_row) % self.height;
+                let neighbor_col = (column + delta_col) % self.width;
+                let idx = self.get_index(neighbor_row, neighbor_col);
+                count += self.cells[idx] as u8;
+            }
+        }
+        count
+    }
+}
+```
 
 <!-- draft -->
 ### Rustのメモリをコピーせず直接レンダリングを行う
